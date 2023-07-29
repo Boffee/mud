@@ -18,6 +18,7 @@ type Options = {
   rpc?: string;
   configPath?: string;
   tsgenOutput: string;
+  anvilOptions?: string;
 };
 
 const commandModule: CommandModule<Options, Options> = {
@@ -36,6 +37,7 @@ const commandModule: CommandModule<Options, Options> = {
         decs: "Path to MUD config",
       },
       tsgenOutput: { type: "string", demandOption: true, desc: "Directory to output MUD typescript definition files" },
+      anvilOptions: { type: "string", description: "Options to pass to anvil" },
     });
   },
 
@@ -64,7 +66,8 @@ const commandModule: CommandModule<Options, Options> = {
       const userHomeDir = homedir();
       rmSync(path.join(userHomeDir, ".foundry", "anvil", "tmp"), { recursive: true, force: true });
 
-      const anvilArgs = ["--block-time", "1", "--block-base-fee-per-gas", "0"];
+      const userOptions = args.anvilOptions?.replaceAll("\\", "").split(" ") ?? [];
+      const anvilArgs = ["--block-time", "1", "--block-base-fee-per-gas", "0", ...userOptions];
       anvil(anvilArgs);
     }
 
